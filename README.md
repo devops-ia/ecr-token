@@ -6,7 +6,7 @@ Create or update token programmatically for [Amazon ECR](https://aws.amazon.com/
 
 Default versions:
 
-* aws-cli: `2.1'.3`
+* aws-cli: `2.1.3`
 * kubectl: `1.25.6`
 
 Here a full [tag list](https://hub.docker.com/repository/docker/devopsiaci/ecr-token/tags?page=1&ordering=last_updated)!
