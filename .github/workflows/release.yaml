@@ -1,0 +1,67 @@
+env:
+  USER: devopsiaci
+  REPO: ecr-token
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Create tag release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kubectl_version:
+        - 1.19.16
+        - 1.20.15
+        - 1.21.13
+        - 1.22.13
+        - 1.22.15
+        - 1.23.10
+        - 1.23.12
+        - 1.23.13
+        - 1.23.14
+        - 1.23.15
+        - 1.23.16
+        - 1.24.10
+        - 1.24.4
+        - 1.24.6
+        - 1.24.7
+        - 1.24.8
+        - 1.24.9
+        - 1.25.0
+        - 1.25.2
+        - 1.25.3
+        - 1.25.4
+        - 1.25.5
+        - 1.25.6
+        - 1.26.0
+        - 1.26.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          build-args: |
+            KUBECTL_VERSION=${{ matrix.kubectl_version }}
+          tags: ${{ env.USER }}/${{ env.REPO }}:kubectl-${{ matrix.kubectl_version }},${{ env.USER }}/${{ env.REPO }}:${{ matrix.kubectl_version }}
+
+      - name: Update Docker registry description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          repository: ${{ env.USER }}/${{ env.REPO }}
