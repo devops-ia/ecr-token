@@ -84,30 +84,6 @@ jobs:
 
           echo -e "$body" > pr-output.log
 
-      - name: "Build and push Docker image"
-        uses: docker/build-push-action@v6
-        if: steps.check_changes.outputs.release_changed == 'true'
-        with:
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-          context: .
-          platforms: linux/amd64
-          push: false
-          tags: ecr-token
-
-      - name: Show changes
-        if: steps.check_changes.outputs.release_changed == 'true'
-        run: |
-          # install dive
-          mkdir dive && cd dive
-          wget https://github.com/wagoodman/dive/releases/download/v${{ vars.DIVE_VERSION }}/dive_${{ vars.DIVE_VERSION }}_linux_amd64.tar.gz
-          tar xzvf dive_${{ vars.DIVE_VERSION }}_linux_amd64.tar.gz
-          cd ..
-
-          # dive
-          echo -e "\n## Dive output\n" >> pr-output.log
-          ./dive/dive -t ecr-token-${{ env.GITHUB_JOB }} >> pr-output.log
-
       - name: Create PR changes
         if: steps.check_changes.outputs.release_changed == 'true'
         uses: peter-evans/create-pull-request@v6
