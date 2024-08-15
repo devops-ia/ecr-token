@@ -1,15 +1,13 @@
-# Create or update token for Amazon ECR
+# Image base ECR token
 
 ## Introduction
 
-Create or update token programmatically for [Amazon ECR](https://aws.amazon.com/en/ecr/).
+Image base with `aws-cli` and `kubectl` for [helm-ecr-token](https://github.com/devops-ia/helm-charts/tree/main/charts/ecr-registry) to create or update token programmatically for [Amazon ECR](https://aws.amazon.com/en/ecr/).
 
-Default versions:
+Default base versions:
 
 * aws-cli: `2.17.30`
 * kubectl: `1.30.3`
-
-Here a full [tag list](https://hub.docker.com/repository/docker/devopsiaci/ecr-token/tags?page=1&ordering=last_updated)!
 
 ## Image details (from dive)
 
