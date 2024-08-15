@@ -27,6 +27,16 @@ You can reproduce this summary with [`dive`](https://github.com/wagoodman/dive):
 dive build -t <tag-name> .
 ```
 
-## Contributing
+## Quick start
 
-We're happy if you want open and issue or a new feature :)
+[**Available images**](https://hub.docker.com/r/devopsiaci/ecr-token/tags)
+
+### Run container
+
+```command
+docker run --name <container-name> awscli2.10.3-kubectl1.30.3
+```
+
+## Use case
+
+This image is used by [helm-ecr-token](https://github.com/devops-ia/helm-charts/tree/main/charts/ecr-registry)

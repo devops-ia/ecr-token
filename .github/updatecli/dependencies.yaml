@@ -1,0 +1,35 @@
+sources:
+  awscli:
+    kind: dockerimage
+    spec:
+      image: amazon/aws-cli
+      architecture: linux/amd64
+      versionFilter:
+        kind: semver
+  kubectl:
+    kind: dockerimage
+    spec:
+      image: alpine/k8s
+      architecture: linux/amd64
+      versionFilter:
+        kind: semver
+conditions: {}
+targets:
+  update-awscli-tag:
+    name: "Update the value of ARG AWSCLI_VERSION in the Dockerfile"
+    sourceid: awscli
+    kind: dockerfile
+    spec:
+      file: Dockerfile
+      instruction:
+        keyword: "ARG"
+        matcher: "AWSCLI_VERSION"
+  update-kubectl-tag:
+    name: "Update the value of ARG KUBECTL_VERSION in the Dockerfile"
+    sourceid: kubectl
+    kind: dockerfile
+    spec:
+      file: Dockerfile
+      instruction:
+        keyword: "ARG"
+        matcher: "KUBECTL_VERSION"

@@ -1,0 +1,123 @@
+name: Check ecr-token new release
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get current tag
+        id: current_release
+        run: |
+          # awscli_release
+          awscli_current_release=$(grep "ARG AWSCLI_VERSION" Dockerfile | cut -d '=' -f 2)
+          echo "awscli_current_release=$awscli_current_release" >> $GITHUB_OUTPUT
+
+          # kubectl_release
+          kubectl_current_release=$(grep "ARG KUBECTL_VERSION" Dockerfile | cut -d '=' -f 2)
+          echo "kubectl_current_release=$kubectl_current_release" >> $GITHUB_OUTPUT
+
+      - name: Install updatecli
+        uses: updatecli/updatecli-action@v2
+
+      - name: Update dependencies
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
+        run: |
+          updatecli apply --config .github/updatecli/dependencies.yaml --commit=false
+
+      - name: Get latest tag
+        id: latest_release
+        run: |
+          # awscli_release
+          awscli_latest_release=$(grep "ARG AWSCLI_VERSION" Dockerfile | cut -d '=' -f 2)
+          echo "awscli_latest_release=$awscli_latest_release" >> $GITHUB_OUTPUT
+
+          # kubectl_release
+          kubectl_latest_release=$(grep "ARG KUBECTL_VERSION" Dockerfile | cut -d '=' -f 2)
+          echo "kubectl_latest_release=$kubectl_latest_release" >> $GITHUB_OUTPUT
+
+          # complete_tag
+          echo "complete_release=aws$awscli_latest_release-kubectl$kubectl_latest_release" >> $GITHUB_OUTPUT
+
+      - name: Check if exists changes
+        id: check_changes
+        env:
+          awscli_current_release: ${{ steps.current_release.outputs.awscli_current_release }}
+          awscli_latest_release: ${{ steps.latest_release.outputs.awscli_latest_release }}
+          kubectl_current_release: ${{ steps.current_release.outputs.kubectl_current_release }}
+          kubectl_latest_release: ${{ steps.latest_release.outputs.kubectl_latest_release }}
+        run: |
+          # awscli
+          if [ "$awscli_current_release" != "$awscli_latest_release" ]; then
+              body+="AWS CLI version:\n"
+              body+="  - :information_source: Current: \`$awscli_current_release\`\n"
+              body+="  - :up: Upgrade: \`$awscli_latest_release\`\n"
+              body+="  - Changelog: https://github.com/aws/aws-cli/releases/tag/$awscli_latest_release\n\n"
+
+              echo "release_changed=true" >> $GITHUB_OUTPUT
+          fi
+
+          # kubectl
+          if [ "$kubectl_current_release" != "$kubectl_latest_release" ]; then
+              body+="Kubectl version:\n"
+              body+="  - :information_source: Current: \`$kubectl_current_release\`\n"
+              body+="  - :up: Upgrade: \`$kubectl_latest_release\`\n"
+              body+="  - Changelog: https://github.com/kubernetes/kubectl/releases/tag/v$kubectl_latest_release\n\n"
+
+              echo "release_changed=true" >> $GITHUB_OUTPUT
+          fi
+
+          echo -e "$body" > pr-output.log
+
+      - name: "Build and push Docker image"
+        uses: docker/build-push-action@v6
+        if: steps.check_changes.outputs.release_changed == 'true'
+        with:
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          context: .
+          platforms: linux/amd64
+          push: false
+          tags: ecr-token
+
+      - name: Show changes
+        if: steps.check_changes.outputs.release_changed == 'true'
+        run: |
+          # install dive
+          mkdir dive && cd dive
+          wget https://github.com/wagoodman/dive/releases/download/v${{ vars.DIVE_VERSION }}/dive_${{ vars.DIVE_VERSION }}_linux_amd64.tar.gz
+          tar xzvf dive_${{ vars.DIVE_VERSION }}_linux_amd64.tar.gz
+          cd ..
+
+          # dive
+          echo -e "\n## Dive output\n" >> pr-output.log
+          ./dive/dive -t ecr-token-${{ env.GITHUB_JOB }} >> pr-output.log
+
+      - name: Create PR changes
+        if: steps.check_changes.outputs.release_changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT_GITHUB }}
+          commit-message: "feat: new ecr-token version ${{ steps.latest_release.outputs.complete_release }}"
+          signoff: false
+          branch: feat/upgrade-ecr-token-${{ steps.latest_release.outputs.complete_release }}
+          delete-branch: true
+          title: '[ecr-token] new release: ${{ steps.latest_release.outputs.complete_release }}'
+          body-path: pr-output.log
+          labels: |
+            auto-pr-bump-version
