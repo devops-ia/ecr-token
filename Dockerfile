@@ -1,8 +1,8 @@
 ARG AWSCLI_VERSION=2.17.30
 ARG KUBECTL_VERSION=1.30.3
 
-FROM alpine/k8s:${KUBECTL_VERSION} as kubectl
-FROM amazon/aws-cli:${AWSCLI_VERSION} as awscli
+FROM alpine/k8s:${KUBECTL_VERSION} AS kubectl
+FROM amazon/aws-cli:${AWSCLI_VERSION} AS awscli
 FROM debian:stable-slim AS main
 
 LABEL maintainer="Iván Alejandro Marugán <hello@ialejandro.rocks>"                         \
