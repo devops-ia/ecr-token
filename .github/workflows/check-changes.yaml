@@ -52,7 +52,7 @@ jobs:
           echo "kubectl_latest_release=$kubectl_latest_release" >> $GITHUB_OUTPUT
 
           # complete_tag
-          echo "complete_release=aws$awscli_latest_release-kubectl$kubectl_latest_release" >> $GITHUB_OUTPUT
+          echo "complete_release=awscli$awscli_latest_release-kubectl$kubectl_latest_release" >> $GITHUB_OUTPUT
 
       - name: Check if exists changes
         id: check_changes

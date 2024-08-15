@@ -43,7 +43,7 @@ jobs:
           echo "kubectl_current_tag=$kubectl_current_tag" >> $GITHUB_OUTPUT
 
           # complete tag
-          echo "complete_tag=aws$awscli_current_tag-kubectl$kubectl_current_tag" >> $GITHUB_OUTPUT
+          echo "complete_tag=awscli$awscli_current_tag-kubectl$kubectl_current_tag" >> $GITHUB_OUTPUT
 
       - name: "Set Docker metadata"
         id: meta
