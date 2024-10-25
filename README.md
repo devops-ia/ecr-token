@@ -6,7 +6,7 @@ Image base with `aws-cli` and `kubectl` for [helm-ecr-token](https://github.com/
 
 Default base versions:
 
-* aws-cli: `2.18.13`
+* aws-cli: `2.18.14`
 * kubectl: `1.31.1`
 
 ## Image details (from dive)
