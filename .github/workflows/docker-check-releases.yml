@@ -1,19 +1,17 @@
-name: Check ecr-token new release
+name: Docker Check Releases
 
 on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   check-and-release:
     runs-on: ubuntu-latest
-
-    permissions:
-      attestations: write
-      contents: write
-      id-token: write
-      packages: write
 
     steps:
       - name: Checkout repository
