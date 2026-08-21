@@ -21,4 +21,10 @@ jobs:
         run: docker build -t ecr-token:pr-check .
 
       - name: Run dive
-        run: CI=true ./dive ecr-token:pr-check
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$PWD":/repo \
+            -w /repo \
+            wagoodman/dive:v0.13.1 \
+            ecr-token:pr-check --ci --ci-config .dive-ci
