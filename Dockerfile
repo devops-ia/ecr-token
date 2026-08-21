@@ -6,7 +6,7 @@ FROM amazon/aws-cli:${AWSCLI_VERSION} AS awscli
 FROM debian:stable-slim AS main
 
 LABEL maintainer="Iván Alejandro Marugán <hello@ialejandro.rocks>"                         \
-      description="Create or update token for Amazon ECR (https://aws.amazon.com/en/ecr/)"
+      description="Image base with kubectl and aws-cli (https://aws.amazon.com/en/ecr/)"
 
 COPY --from=kubectl /usr/bin/kubectl /usr/local/bin/
 COPY --from=awscli /usr/local/aws-cli/ /usr/local/aws-cli/
