@@ -32,6 +32,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          token: ${{ secrets.PAT_GITHUB }}
 
       - name: Read tags from Dockerfile
         id: current_tag
@@ -96,8 +97,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
 
       - name: "Update README.md default version"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # replace default version
           sed -i "s/\* aws-cli: .*/* aws-cli: \`${{ steps.current_tag.outputs.awscli_current_tag }}\`/" README.md

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Image base with `aws-cli` and `kubectl` for [helm-ecr-token](https://github.com/devops-ia/helm-charts/tree/main/charts/ecr-registry) to create or update token programmatically for [Amazon ECR](https://aws.amazon.com/en/ecr/).
+Image base with `aws-cli` and `kubectl` for [helm-ecr-token](https://github.com/devops-ia/helm-charts/tree/main/charts/ecr-token) to create or update token programmatically for [Amazon ECR](https://aws.amazon.com/en/ecr/).
 
 Default base versions:
 
@@ -37,4 +37,4 @@ docker run --name <container-name> awscli2.10.3-kubectl1.30.3
 
 ## Use case
 
-This image is used by [helm-ecr-token](https://github.com/devops-ia/helm-charts/tree/main/charts/ecr-registry)
+This image is used by [helm-ecr-token](https://github.com/devops-ia/helm-charts/tree/main/charts/ecr-token)
